@@ -1,0 +1,60 @@
+dataset: saas_warehouse
+version: 1
+
+metrics:
+  - name: mrr_usd
+    label: Monthly Recurring Revenue (USD)
+    description: >
+      Sum of recurring revenue from paid plans (basic, pro) for subscriptions active on a given day.
+      This uses v_daily_mrr, which treats a subscription as active on a day if started_at <= day
+      and (cancelled_at is null OR cancelled_at > day).
+    grain: day
+    source: v_daily_mrr
+    sql: |
+      SELECT day, mrr_usd
+      FROM v_daily_mrr;
+
+  - name: churned_subscriptions
+    label: Churned Subscriptions (count)
+    description: >
+      Count of paid subscriptions (basic, pro) that were cancelled on a given day.
+    grain: day
+    source: v_daily_churn
+    sql: |
+      SELECT day, churned_subscriptions
+      FROM v_daily_churn;
+
+  - name: dau
+    label: Daily Active Users
+    description: >
+      Distinct count of users who generated at least one event on a given day.
+      Uses all events in the events table.
+    grain: day
+    source: v_dau
+    sql: |
+      SELECT day, dau
+      FROM v_dau;
+
+  - name: wau
+    label: Weekly Active Users
+    description: >
+      Distinct count of users who generated at least one event during an ISO week.
+      Week start is date_trunc('week', event_ts).
+    grain: week
+    source: v_wau
+    sql: |
+      SELECT week_start, wau
+      FROM v_wau;
+
+  - name: active_paid_subscriptions
+    label: Active Paid Subscriptions
+    description: >
+      Count of currently active subscriptions with plan in (basic, pro).
+      Note: "active" is based on the subscriptions.status field.
+    grain: now
+    source: subscriptions
+    sql: |
+      SELECT COUNT(*) AS active_paid_subscriptions
+      FROM subscriptions
+      WHERE status = 'active'
+        AND plan IN ('basic', 'pro');
