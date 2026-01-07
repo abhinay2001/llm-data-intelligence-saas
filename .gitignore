@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Tooling
+.idea/
+.vscode/
+
+# Data (we'll keep small sample data tracked later, but not large dumps)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
